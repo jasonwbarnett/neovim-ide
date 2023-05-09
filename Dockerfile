@@ -3,7 +3,8 @@ FROM ubuntu:22.04
 RUN apt update && apt upgrade -y
 
 # Install core tools
-RUN apt install -y build-essential \
+RUN apt install -y ack \
+                   build-essential \
                    curl \
                    fasd \
                    fonts-powerline \
