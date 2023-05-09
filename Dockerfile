@@ -5,6 +5,7 @@ RUN apt update && apt upgrade -y
 # Install core tools
 RUN apt install -y build-essential \
                    curl \
+                   fonts-powerline \
                    git \
                    ripgrep \
                    unzip \
