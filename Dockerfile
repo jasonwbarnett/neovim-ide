@@ -49,8 +49,6 @@ RUN ./nvim.appimage --appimage-extract && \
     rm ./nvim.appimage && \
     mv /squashfs-root /opt/neovim
 RUN ln -s /opt/neovim/AppRun /usr/bin/nvim
-RUN echo 'alias vi=nvim' >> ~/.bashrc
-RUN echo 'alias vim=nvim' >> ~/.bashrc
 
 # Install nvim config
 RUN mkdir -p ~/.config
@@ -68,7 +66,7 @@ RUN pip3 install neovim
 
 # Install Ruby 3.2
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-RUN echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc
+RUN echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.oh-my-zsh/custom/rbenv.zsh
 RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
 ENV PATH /root/.rbenv/shims:/root/.rbenv/bin:$PATH
 RUN apt install zlib1g-dev libyaml-dev libssl-dev -y
