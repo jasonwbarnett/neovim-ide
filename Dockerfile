@@ -33,7 +33,7 @@ RUN echo 'alias vim=nvim' >> ~/.bashrc
 # Install Ruby 3.2
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 RUN echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc
-RUN git clone https://github.com/rbenv/ruby-build.git /root/.rbenv/plugins/ruby-build
+RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
 ENV PATH /root/.rbenv/shims:/root/.rbenv/bin:$PATH
 RUN apt install zlib1g-dev libyaml-dev libssl-dev -y
 RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
