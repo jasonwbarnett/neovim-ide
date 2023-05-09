@@ -26,6 +26,20 @@ RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
 ## Install powerlevel10k
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
 RUN sed -ri 's@^ZSH_THEME=.*@ZSH_THEME="powerlevel10k/powerlevel10k"@g' ~/.zshrc
+RUN curl -LO https://github.com/romkatv/gitstatus/releases/download/v1.5.4/gitstatusd-linux-x86_64.tar.gz && \
+    mkdir -p ~/.cache/gitstatus && \
+    tar zxf gitstatusd-linux-x86_64.tar.gz -C ~/.cache/gitstatus && \
+    rm gitstatusd-linux-x86_64.tar.gz
+
+## Drop .zshrc
+COPY --chown=root:root --chmod=0644 .zshrc /root/.zshrc
+COPY --chown=root:root --chmod=0644 .p10k.zsh /root/.p10k.zsh
+
+## lay down custom configs
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/bash/aliases.sh -o ~/.oh-my-zsh/custom/aliases.zsh
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitconfig -o ~/.gitconfig
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitignore -o ~/.gitignore
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/zsh/fasd.zsh -o ~/.oh-my-zsh/custom/fasd.zsh
 
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
