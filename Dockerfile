@@ -6,10 +6,12 @@ RUN apt update && apt upgrade -y
 RUN apt install -y ack \
                    build-essential \
                    curl \
+                   dnsutils \
                    fasd \
                    fonts-powerline \
                    git \
                    ripgrep \
+                   telnet \
                    unzip \
                    wget \
                    zsh
