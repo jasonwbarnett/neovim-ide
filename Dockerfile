@@ -8,7 +8,18 @@ RUN apt install -y build-essential \
                    git \
                    ripgrep \
                    unzip \
-                   wget
+                   wget \
+                   zsh
+
+# Zsh Configuration
+RUN chsh -s /bin/zsh root
+
+## Install Oh My Zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+
+## Install fzf
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
+    ~/.fzf/install --all
 
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
@@ -49,3 +60,6 @@ RUN gem install neovim
 RUN apt install -y golang
 
 RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
+
+ENTRYPOINT ["/bin/zsh"]
+CMD ["-l"]
