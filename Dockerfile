@@ -25,8 +25,9 @@ RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
 RUN chmod u+x nvim.appimage
-RUN ./nvim.appimage --appimage-extract
-RUN mv /squashfs-root /opt/neovim
+RUN ./nvim.appimage --appimage-extract && \
+    rm ./nvim.appimage && \
+    mv /squashfs-root /opt/neovim
 RUN ln -s /opt/neovim/AppRun /usr/bin/nvim
 RUN echo 'alias vi=nvim' >> ~/.bashrc
 RUN echo 'alias vim=nvim' >> ~/.bashrc
