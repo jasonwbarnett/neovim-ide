@@ -10,6 +10,7 @@ RUN apt install -y ack \
                    fasd \
                    fonts-powerline \
                    git \
+                   iputils-ping \
                    ripgrep \
                    telnet \
                    unzip \
