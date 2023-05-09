@@ -5,7 +5,8 @@ RUN apt update && apt upgrade -y
 # Install core tools
 RUN apt install -y curl \
                    git \
-		   build-essential
+                   ripgrep \
+                   build-essential
 
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
