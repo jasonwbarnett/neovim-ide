@@ -39,4 +39,8 @@ RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN rbenv global $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN echo 'gem: --no-document' >> ~/.gemrc
 # Ruby LSP
-RUN gem install solargraph
+
+# Install golang
+RUN apt install -y golang
+
+RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
