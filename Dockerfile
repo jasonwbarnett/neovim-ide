@@ -75,11 +75,11 @@ RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN rbenv global $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN echo 'gem: --no-document' >> ~/.gemrc
 RUN gem install neovim
-# Ruby LSP
 
 # Install golang
 RUN apt install -y golang
 
+# Install LSPs
 RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
 
 ENTRYPOINT ["/bin/zsh"]
