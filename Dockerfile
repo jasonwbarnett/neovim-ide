@@ -22,6 +22,10 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
     ~/.fzf/install --all
 
+## Install powerlevel10k
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
+RUN sed -ri 's@^ZSH_THEME=.*@ZSH_THEME="powerlevel10k/powerlevel10k"@g' ~/.zshrc
+
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
 RUN chmod u+x nvim.appimage
