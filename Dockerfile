@@ -47,8 +47,38 @@ RUN curl -L https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz/do
     popd && \
     rm -rf zsh-5.9.tar.gz zsh-5.9
 
-# Zsh Configuration
-RUN chsh -s /usr/local/bin/zsh root
+# Install neovim
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+RUN chmod u+x nvim.appimage
+RUN ./nvim.appimage --appimage-extract && \
+    rm ./nvim.appimage && \
+    mv /squashfs-root /opt/neovim
+RUN ln -s /opt/neovim/AppRun /usr/bin/nvim
+
+# Install Python 3.11
+RUN yum install -y rh-python38-python-pip rh-python38
+ENV PATH=/opt/rh/rh-python38/root/usr/local/bin:/opt/rh/rh-python38/root/usr/bin${PATH:+:${PATH}}
+ENV LD_LIBRARY_PATH=/opt/rh/rh-python38/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+ENV MANPATH=/opt/rh/rh-python38/root/usr/share/man:$MANPATH
+ENV PKG_CONFIG_PATH=/opt/rh/rh-python38/root/usr/lib64/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}
+ENV XDG_DATA_DIRS="/opt/rh/rh-python38/root/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
+RUN pip3 install neovim
+
+# Install rustc
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# Install golang
+RUN yum install -y golang
+
+# Install Ruby build deps
+RUN yum install -y zlib-devel openssl-devel readline-devel zlib-devel libffi-devel libyaml-devel
+
+
+## CREATE USER
+RUN useradd -m jason.barnett -s /usr/local/bin/zsh
+USER jason.barnett
+WORKDIR /home/jason.barnett
 
 ## Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
@@ -66,8 +96,8 @@ RUN curl -LO https://github.com/romkatv/gitstatus/releases/download/v1.5.4/gitst
     rm gitstatusd-linux-x86_64.tar.gz
 
 ## Drop .zshrc
-COPY --chown=root:root --chmod=0644 .zshrc /root/.zshrc
-COPY --chown=root:root --chmod=0644 .p10k.zsh /root/.p10k.zsh
+COPY --chown=jason.barnett:jason.barnett --chmod=0644 .zshrc ~/.zshrc
+COPY --chown=jason.barnett:jason.barnett --chmod=0644 .p10k.zsh ~/.p10k.zsh
 
 ## lay down custom configs
 RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/bash/aliases.sh -o ~/.oh-my-zsh/custom/aliases.zsh
@@ -75,53 +105,20 @@ RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/
 RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitignore -o ~/.gitignore
 RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/zsh/fasd.zsh -o ~/.oh-my-zsh/custom/fasd.zsh
 
-# Install neovim
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-RUN chmod u+x nvim.appimage
-RUN ./nvim.appimage --appimage-extract && \
-    rm ./nvim.appimage && \
-    mv /squashfs-root /opt/neovim
-RUN ln -s /opt/neovim/AppRun /usr/bin/nvim
-
 # Install nvim config
 RUN mkdir -p ~/.config
 RUN git clone https://github.com/jasonwbarnett/kickstart.nvim.git ~/.config/nvim
 RUN nvim --headless "+Lazy! sync" +qa
 
-# Install Python 3.11
-RUN yum install -y rh-python38-python-pip rh-python38
-#RUN cat /opt/rh/rh-python38/enable >> ~/.bashrc
-ENV PATH=/opt/rh/rh-python38/root/usr/local/bin:/opt/rh/rh-python38/root/usr/bin${PATH:+:${PATH}}
-ENV LD_LIBRARY_PATH=/opt/rh/rh-python38/root/usr/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-ENV MANPATH=/opt/rh/rh-python38/root/usr/share/man:$MANPATH
-ENV PKG_CONFIG_PATH=/opt/rh/rh-python38/root/usr/lib64/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}
-ENV XDG_DATA_DIRS="/opt/rh/rh-python38/root/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
-RUN pip3 install neovim
-
-# Install rustc
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
 # Install Ruby 3.1
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 RUN echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.oh-my-zsh/custom/rbenv.zsh
 RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-ENV PATH /root/.rbenv/shims:/root/.rbenv/bin:$PATH
-## RUN curl -LO http://pyyaml.org/download/libyaml/yaml-0.2.5.tar.gz && \
-##     tar zxf yaml-0.2.5.tar.gz && \
-##     pushd yaml-0.2.5 && \
-##     ./configure && \
-##     make && \
-##     make install
-
-RUN yum install -y zlib-devel openssl-devel readline-devel zlib-devel libffi-devel libyaml-devel
+ENV PATH /home/jason.barnett/.rbenv/shims:/home/jason.barnett/.rbenv/bin:$PATH
 RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN rbenv global $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN echo 'gem: --no-document' >> ~/.gemrc
 RUN gem install neovim
-
-# Install golang
-RUN yum install -y golang
 
 # Install LSPs
 RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
