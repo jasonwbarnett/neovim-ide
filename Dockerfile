@@ -7,11 +7,7 @@ RUN yum update -y
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 RUN rpm -Uvh https://repo.ius.io/ius-release-el7.rpm
 RUN yum install -y centos-release-scl centos-release-scl-rh
-
-#12 3.264 No package powerline-fonts available.
-#12 3.348 No package ripgrep available.
-#12 3.371 No package RUN available.
-#12 3.530 No package install available.
+RUN yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo
 
 # Install core tools
 RUN yum install -y ack \
@@ -25,6 +21,7 @@ RUN yum install -y ack \
                    iputils \
                    make \
                    ncurses-devel \
+                   ripgrep \
                    telnet \
                    unzip \
                    wget
