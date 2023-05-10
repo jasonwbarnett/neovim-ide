@@ -1,4 +1,4 @@
-FROM centos:centos7
+FROM centos:centos7 as build
 
 # Ensure updated base
 RUN yum update -y
@@ -125,6 +125,9 @@ RUN yum install -y golang
 
 # Install LSPs
 RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
+
+FROM scratch
+COPY --from=build / /
 
 ENTRYPOINT ["/usr/local/bin/zsh"]
 CMD ["-l"]
