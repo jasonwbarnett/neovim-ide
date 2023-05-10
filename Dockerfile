@@ -1,13 +1,11 @@
-FROM registry.access.redhat.com/ubi7/ubi
+FROM centos:centos7
 
 # Ensure updated base
 RUN yum update -y
 
 # Enable extra repos
-COPY --chown=root:root --chmod=0644 centos-os.repo /etc/yum.repos.d/centos-os.repo
 RUN rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 RUN rpm -Uvh https://repo.ius.io/ius-release-el7.rpm
-RUN yum-config-manager --enable ubi-7-server-devtools-rpms
 RUN yum install -y centos-release-scl centos-release-scl-rh
 
 #12 3.264 No package powerline-fonts available.
