@@ -45,7 +45,7 @@ RUN curl -L https://sourceforge.net/projects/zsh/files/zsh/5.9/zsh-5.9.tar.xz/do
     make && \
     make install && \
     popd && \
-    rm -rf zsh-5.9.tar.gz zsh-5.9
+    rm -rf zsh-5.9.tar.xz zsh-5.9
 
 # Install neovim
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
@@ -79,45 +79,46 @@ RUN yum install -y zlib-devel openssl-devel readline-devel zlib-devel libffi-dev
 RUN useradd -m jason.barnett -s /usr/local/bin/zsh
 USER jason.barnett
 WORKDIR /home/jason.barnett
+ENV HOME=/home/jason.barnett
 
 ## Install Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 ## Install fzf
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && \
-    ~/.fzf/install --all
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf && \
+    $HOME/.fzf/install --all
 
 ## Install powerlevel10k
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
-RUN sed -ri 's@^ZSH_THEME=.*@ZSH_THEME="powerlevel10k/powerlevel10k"@g' ~/.zshrc
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $HOME/.oh-my-zsh/custom/themes/powerlevel10k
+RUN sed -ri 's@^ZSH_THEME=.*@ZSH_THEME="powerlevel10k/powerlevel10k"@g' $HOME/.zshrc
 RUN curl -LO https://github.com/romkatv/gitstatus/releases/download/v1.5.4/gitstatusd-linux-x86_64.tar.gz && \
-    mkdir -p ~/.cache/gitstatus && \
-    tar zxf gitstatusd-linux-x86_64.tar.gz -C ~/.cache/gitstatus && \
+    mkdir -p $HOME/.cache/gitstatus && \
+    tar zxf gitstatusd-linux-x86_64.tar.gz -C $HOME/.cache/gitstatus && \
     rm gitstatusd-linux-x86_64.tar.gz
 
 ## Drop .zshrc
-COPY --chown=jason.barnett:jason.barnett --chmod=0644 .zshrc ~/.zshrc
-COPY --chown=jason.barnett:jason.barnett --chmod=0644 .p10k.zsh ~/.p10k.zsh
+COPY --chown=jason.barnett:jason.barnett --chmod=0644 .zshrc $HOME/.zshrc
+COPY --chown=jason.barnett:jason.barnett --chmod=0644 .p10k.zsh $HOME/.p10k.zsh
 
 ## lay down custom configs
-RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/bash/aliases.sh -o ~/.oh-my-zsh/custom/aliases.zsh
-RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitconfig -o ~/.gitconfig
-RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitignore -o ~/.gitignore
-RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/zsh/fasd.zsh -o ~/.oh-my-zsh/custom/fasd.zsh
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/bash/aliases.sh -o $HOME/.oh-my-zsh/custom/aliases.zsh
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitconfig -o $HOME/.gitconfig
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/git/gitignore -o $HOME/.gitignore
+RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/zsh/fasd.zsh -o $HOME/.oh-my-zsh/custom/fasd.zsh
 
 # Install nvim config
-RUN mkdir -p ~/.config
-RUN git clone https://github.com/jasonwbarnett/kickstart.nvim.git ~/.config/nvim
+RUN mkdir -p $HOME/.config
+RUN git clone https://github.com/jasonwbarnett/kickstart.nvim.git $HOME/.config/nvim
 RUN nvim --headless "+Lazy! sync" +qa
 
 # Install Ruby 3.1
-RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-RUN echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.oh-my-zsh/custom/rbenv.zsh
-RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
+RUN echo 'eval "$($HOME/.rbenv/bin/rbenv init - bash)"' >> $HOME/.oh-my-zsh/custom/rbenv.zsh
+RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
 ENV PATH /home/jason.barnett/.rbenv/shims:/home/jason.barnett/.rbenv/bin:$PATH
 RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN rbenv global $(rbenv install -l | grep -v -- - | grep '^3.2')
-RUN echo 'gem: --no-document' >> ~/.gemrc
+RUN echo 'gem: --no-document' >> $HOME/.gemrc
 RUN gem install neovim
 
 # Install LSPs
@@ -125,6 +126,10 @@ RUN nvim --headless "+LspInstall lua_ls solargraph gopls" +qa
 
 FROM scratch
 COPY --from=build / /
+
+USER jason.barnett
+WORKDIR /home/jason.barnett
+ENV HOME=/home/jason.barnett
 
 ENTRYPOINT ["/usr/local/bin/zsh"]
 CMD ["-l"]
