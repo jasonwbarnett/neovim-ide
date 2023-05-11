@@ -16,9 +16,10 @@ RUN yum install -y ack \
                    devtoolset-11-gcc \
                    devtoolset-11-gcc-c++ \
                    fasd \
-                   gcc \
                    git236 \
                    iputils \
+                   openssl11 \
+                   openssl11-devel \
                    make \
                    ncurses-devel \
                    ripgrep \
@@ -113,7 +114,7 @@ RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
 RUN echo 'eval "$($HOME/.rbenv/bin/rbenv init - bash)"' >> $HOME/.oh-my-zsh/custom/rbenv.zsh
 RUN git clone https://github.com/rbenv/ruby-build.git $HOME/.rbenv/plugins/ruby-build
 ENV PATH /home/jason.barnett/.rbenv/shims:/home/jason.barnett/.rbenv/bin:$PATH
-RUN rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
+RUN RUBY_CONFIGURE_OPTS='--with-openssl-dir=/usr/include/openssl11 --with-openssl-lib=/usr/lib64/openssl11 --with-openssl-include=/usr/include/openssl11' rbenv install $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN rbenv global $(rbenv install -l | grep -v -- - | grep '^3.2')
 RUN echo 'gem: --no-document' >> $HOME/.gemrc
 RUN gem install neovim
