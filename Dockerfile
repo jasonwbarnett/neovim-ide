@@ -62,9 +62,6 @@ ENV XDG_DATA_DIRS="/opt/rh/rh-python38/root/usr/share:${XDG_DATA_DIRS:-/usr/loca
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
 RUN pip3 install neovim
 
-# Install rustc
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
 # Install golang
 RUN yum install -y golang
 
@@ -107,6 +104,9 @@ RUN curl -L https://raw.githubusercontent.com/jasonwbarnett/dotfiles/master/zsh/
 RUN mkdir -p $HOME/.config
 RUN git clone https://github.com/jasonwbarnett/kickstart.nvim.git $HOME/.config/nvim
 RUN nvim --headless "+Lazy! sync" +qa
+
+# Install rustc, a Ruby 3.2 dependency
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 # Install Ruby 3.1
 RUN git clone https://github.com/rbenv/rbenv.git $HOME/.rbenv
